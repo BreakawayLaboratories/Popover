@@ -21,6 +21,7 @@ public enum PopoverOption {
   case color(UIColor)
   case dismissOnBlackOverlayTap(Bool)
   case showBlackOverlay(Bool)
+  case pointerDistance(CGFloat)
 }
 
 @objc public enum PopoverType: Int {
@@ -44,6 +45,7 @@ open class Popover: UIView {
   open var showBlackOverlay: Bool = true
   open var highlightFromView: Bool = false
   open var highlightCornerRadius: CGFloat = 0
+  open var pointerDistance: CGFloat = 0
 
   // custom closure
   open var willShowHandler: (() -> ())?
@@ -106,6 +108,8 @@ open class Popover: UIView {
           self.dismissOnBlackOverlayTap = value
         case let .showBlackOverlay(value):
             self.showBlackOverlay = value
+        case let .pointerDistance(value):
+            self.pointerDistance = value
         }
       }
     }
@@ -198,12 +202,14 @@ open class Popover: UIView {
   }
 
   open func show(_ contentView: UIView, fromView: UIView, inView: UIView) {
-    let point: CGPoint
+    var point: CGPoint
     switch self.popoverType {
     case .up:
         point = inView.convert(CGPoint(x: fromView.frame.origin.x + (fromView.frame.size.width / 2), y: fromView.frame.origin.y), from: fromView.superview)
+        point = CGPoint(x: point.x, y: point.y - self.pointerDistance)
     case .down:
         point = inView.convert(CGPoint(x: fromView.frame.origin.x + (fromView.frame.size.width / 2), y: fromView.frame.origin.y + fromView.frame.size.height), from: fromView.superview)
+        point = CGPoint(x: point.x, y: point.y + self.pointerDistance)
     }
 
     if self.highlightFromView {
