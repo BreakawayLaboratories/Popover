@@ -132,6 +132,9 @@ open class Popover: UIView {
         frame.origin.x += abs(frame.minX) + sideEdge
       }
     }
+    
+    frame.origin.x = (self.containerView.frame.size.width - frame.size.width)/2 // center it
+    
     self.frame = frame
 
     let arrowPoint = self.containerView.convert(self.arrowShowPoint, to: self)
