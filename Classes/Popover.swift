@@ -133,8 +133,6 @@ open class Popover: UIView {
       }
     }
     
-    frame.origin.x = (self.containerView.frame.size.width - frame.size.width)/2 // center it
-    
     self.frame = frame
 
     let arrowPoint = self.containerView.convert(self.arrowShowPoint, to: self)
@@ -159,6 +157,14 @@ open class Popover: UIView {
     self.layer.position = CGPoint(x: x, y: y)
 
     frame.size.height += self.arrowSize.height
+    
+    // try to center the frame if possible
+    let centeredX = (self.containerView.frame.size.width - frame.size.width)/2 // center it
+    if (centeredX + cornerRadius + arrowSize.width/2 <= self.arrowShowPoint.x) &&
+        (centeredX + frame.size.width - cornerRadius - arrowSize.width/2 >= self.arrowShowPoint.x) {
+        frame.origin.x = centeredX
+    }
+    
     self.frame = frame
   }
 
