@@ -264,12 +264,14 @@ open class Popover: UIView {
     case .down:
       self.contentView.frame.origin.y = self.arrowSize.height
     }
-    self.addSubview(self.contentView)
-    self.containerView.addSubview(self)
-
     self.create()
     self.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
-	self.willShowHandler?()
+	
+    self.addSubview(self.contentView)
+    self.containerView.addSubview(self)
+    
+    self.willShowHandler?()
+    
     UIView.animate(withDuration: self.animationIn, delay: 0,
       usingSpringWithDamping: 0.7,
       initialSpringVelocity: 3,
