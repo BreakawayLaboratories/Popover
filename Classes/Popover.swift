@@ -19,6 +19,7 @@ public enum PopoverOption {
   case overlayBlur(UIBlurEffectStyle)
   case type(PopoverType)
   case color(UIColor)
+  case arrowColor(UIColor)
   case dismissOnBlackOverlayTap(Bool)
   case showBlackOverlay(Bool)
   case pointerDistance(CGFloat)
@@ -41,6 +42,7 @@ open class Popover: UIView {
   open var blackOverlayColor: UIColor = UIColor(white: 0.0, alpha: 0.2)
   open var overlayBlur: UIBlurEffect?
   open var popoverColor: UIColor = UIColor.white
+  open var arrowColor: UIColor = UIColor.white
   open var dismissOnBlackOverlayTap: Bool = true
   open var showBlackOverlay: Bool = true
   open var highlightFromView: Bool = false
@@ -104,6 +106,8 @@ open class Popover: UIView {
           self.popoverType = value
         case let .color(value):
           self.popoverColor = value
+        case let .arrowColor(value):
+          self.arrowColor = value
         case let .dismissOnBlackOverlayTap(value):
           self.dismissOnBlackOverlayTap = value
         case let .showBlackOverlay(value):
@@ -315,19 +319,23 @@ open class Popover: UIView {
 
   override open func draw(_ rect: CGRect) {
     super.draw(rect)
-    let arrow = UIBezierPath()
-    let color = self.popoverColor
+    var arrow = UIBezierPath()
     let arrowPoint = self.containerView.convert(self.arrowShowPoint, to: self)
     switch self.popoverType {
     case .up:
+      // draw and fill arrow
       arrow.move(to: CGPoint(x: arrowPoint.x, y: self.bounds.height))
-      arrow.addLine(
-        to: CGPoint(
-          x: arrowPoint.x - self.arrowSize.width * 0.5,
-          y: isCornerLeftArrow() ? self.arrowSize.height : self.bounds.height - self.arrowSize.height
-        )
-      )
-
+      let arrowBaseLeft = CGPoint(x: arrowPoint.x - self.arrowSize.width * 0.5,
+                                  y: isCornerLeftArrow() ? self.arrowSize.height : self.bounds.height - self.arrowSize.height)
+      arrow.addLine(to: arrowBaseLeft)
+      arrow.addLine(to: CGPoint(x: arrowBaseLeft.x + self.arrowSize.width, y: arrowBaseLeft.y))
+      self.arrowColor.setFill()
+      arrow.fill()
+      
+      // draw the rest
+      arrow = UIBezierPath()
+      arrow.move(to: arrowBaseLeft)
+      
       arrow.addLine(to: CGPoint(x: self.cornerRadius, y: self.bounds.height - self.arrowSize.height))
       arrow.addArc(
         withCenter: CGPoint(
@@ -376,13 +384,19 @@ open class Popover: UIView {
         y: isCornerRightArrow() ? self.arrowSize.height : self.bounds.height - self.arrowSize.height))
 
     case .down:
+      // draw and fill arrow
       arrow.move(to: CGPoint(x: arrowPoint.x, y: 0))
-      arrow.addLine(
-        to: CGPoint(
-          x: arrowPoint.x + self.arrowSize.width * 0.5,
-          y: isCornerRightArrow() ? self.arrowSize.height + self.bounds.height : self.arrowSize.height
-        ))
-
+      let arrowBaseRight = CGPoint(x: arrowPoint.x + self.arrowSize.width * 0.5,
+                                   y: isCornerRightArrow() ? self.arrowSize.height + self.bounds.height : self.arrowSize.height)
+      arrow.addLine(to: arrowBaseRight)
+      arrow.addLine(to: CGPoint(x: arrowBaseRight.x - self.arrowSize.width, y: arrowBaseRight.y))
+      self.arrowColor.setFill()
+      arrow.fill()
+      
+      // draw the rest
+      arrow = UIBezierPath()
+      arrow.move(to: arrowBaseRight)
+      
       arrow.addLine(to: CGPoint(x: self.bounds.width - self.cornerRadius, y: self.arrowSize.height))
       arrow.addArc(
         withCenter: CGPoint(
@@ -430,7 +444,7 @@ open class Popover: UIView {
         y: isCornerLeftArrow() ? self.arrowSize.height + self.bounds.height : self.arrowSize.height))
     }
 
-    color.setFill()
+    self.popoverColor.setFill()
     arrow.fill()
   }
 
